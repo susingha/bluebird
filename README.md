@@ -59,6 +59,8 @@ GIF created with [LiceCap](http://www.cockos.com/licecap/).
 ## Notes
 
 Describe any challenges encountered while building the app.
+Implmenting the Compose Tweet UI using Fragments and communicating with parent activity.
+Handling Offline mode.
 
 ## Open-source libraries used
 
