@@ -54,7 +54,7 @@ Here's a walkthrough of implemented user stories:
 
 [Full Demo Youtube Link](https://www.youtube.com/watch?v=UDUv4gcErgI)
 
-[imgur GIF Link](http://i.imgur.com/xcL7SJV.gif).
+[imgur GIF Link](http://i.imgur.com/xcL7SJV.gif) (Not a full demo)
 
 ## Notes
 
