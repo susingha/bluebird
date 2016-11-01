@@ -1,0 +1,50 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:id="@+id/tvBanner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:text="@string/new_tweet" />
+
+        <EditText
+            android:id="@+id/etCompose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvBanner"
+            android:hint="@string/say_something" />
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/etCompose"
+            android:layout_margin="@dimen/activity_vertical_margin"
+            android:background="@android:color/holo_blue_bright"
+            android:onClick="onSendTweet"
+            android:text="@string/send" />
+
+        <TextView
+            android:id="@+id/tvCounter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0/140"
+            android:gravity="center"
+            android:textColor="@android:color/holo_green_dark"
+            android:layout_toLeftOf="@+id/btnSend"
+            android:layout_alignBottom="@+id/btnSend"
+            android:layout_alignTop="@+id/btnSend"/>
+
+    </RelativeLayout>
+
+</FrameLayout>
