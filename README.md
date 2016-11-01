@@ -54,7 +54,7 @@ Here's a walkthrough of implemented user stories:
 
 [Full Demo Youtube Link](https://www.youtube.com/watch?v=UDUv4gcErgI)
 
-<img src='https://www.youtube.com/watch?v=UDUv4gcErgI' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+<img src='http://i.imgur.com/xcL7SJV.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
