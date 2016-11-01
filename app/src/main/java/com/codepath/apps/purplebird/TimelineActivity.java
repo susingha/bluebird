@@ -206,27 +206,32 @@ public class TimelineActivity extends AppCompatActivity {
                 Log.d(TAG, "home_timeline - onFailure");
                 Toast.makeText(getApplicationContext(), "API Rate Limited. Loading from storage", Toast.LENGTH_SHORT).show();
 
-                // Check if we have stored json in persistent storage
-                if (lastTweetsArray.isEmpty()) {
-                    File filesDir = getFilesDir();
-                    File todoFile = new File(filesDir, PERSIST_FILE);
-                    try {
-                        String json = FileUtils.readFileToString(todoFile).toString();
+                if(page_t == PageType.FIRST) {
+                    // Check if we have stored json in persistent storage
+                    if (lastTweetsArray.isEmpty()) {
+                        File filesDir = getFilesDir();
+                        File todoFile = new File(filesDir, PERSIST_FILE);
                         try {
-                            JSONArray jsonArray = new JSONArray(json);
-                            newTweetsArrayRef = Tweet.fromJSONArray(jsonArray);
-                        } catch (JSONException e) {
+                            String json = FileUtils.readFileToString(todoFile).toString();
+                            try {
+                                JSONArray jsonArray = new JSONArray(json);
+                                newTweetsArrayRef = Tweet.fromJSONArray(jsonArray);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    } catch ( IOException e) {
-                        e.printStackTrace();
+                    } else {
+                        newTweetsArrayRef = lastTweetsArray;
                     }
-                } else {
-                    newTweetsArrayRef = lastTweetsArray;
-                }
 
-                // Retrieve json from Persistent storage and show on screen
-                aTweets.addAll(newTweetsArrayRef);
+                    // Retrieve json from Persistent storage and show on screen
+                    aTweets.addAll(newTweetsArrayRef);
+                } else {
+                    Toast.makeText(getApplicationContext(), "API Rate Limited. Cannot load more", Toast.LENGTH_SHORT).show();
+                    aTweets.notifyDataSetChanged();
+                }
 
                 swipeContainer.setRefreshing(false);
                 swipeContainer.setEnabled(true);
