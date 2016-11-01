@@ -46,13 +46,15 @@ The following **bonus** features are implemented:
 
 The following **additional** features are implemented:
 
-* [ ] List anything else that you can get done to improve the app functionality!
+* [x] Disable the compose button when character count exceeds 140 characters
 
 ## Video Walkthrough
 
 Here's a walkthrough of implemented user stories:
 
-<img src='http://i.imgur.com/link/to/your/gif/file.gif' title='Video Walkthrough' width='' alt='Video Walkthrough' />
+[Full Demo Youtube Link](https://www.youtube.com/watch?v=UDUv4gcErgI)
+
+<img src='https://www.youtube.com/watch?v=UDUv4gcErgI' title='Video Walkthrough' width='' alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
