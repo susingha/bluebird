@@ -8,6 +8,15 @@
         android:id="@+id/itCompose"
         android:icon="@drawable/ic_comment_black_24dp"
         android:title="@string/new_tweet"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        android:onClick="onComposeView"/>
+
+
+    <item
+        android:id="@+id/itProfile"
+        android:icon="@drawable/ic_person_black_24dp"
+        android:title="@string/profile"
+        app:showAsAction="always"
+        android:onClick="onProfileView"/>
 
 </menu>

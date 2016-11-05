@@ -26,18 +26,22 @@ import static com.raizlabs.android.dbflow.config.FlowLog.TAG;
  * 
  */
 
-enum PageType {
-	FIRST,
-	NEXT,
-}
+
 
 public class TwitterNetworkClient extends OAuthBaseClient {
+
+
+	public enum PageType {
+		FIRST,
+		NEXT,
+	}
+
 	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
 	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
 	public static final String REST_CONSUMER_KEY = "NelFk49mtKeK3SbceWJomihfi";       // Change this
 	public static final String REST_CONSUMER_SECRET = "VgA77OCHM3lKaQWdcBIngv1oWxnJf1uk4foGgM8STN8zyCu3BI"; // Change this
 	public static final String REST_CALLBACK_URL = "oauth://cppurplebird"; // Change this (here and in manifest)
-    public static final int REST_TWEET_COUNT = 10;
+    public static final int REST_TWEET_COUNT = 25;
 
 
 
@@ -80,8 +84,65 @@ public class TwitterNetworkClient extends OAuthBaseClient {
 		}
 
 		// Execute the request
-		Log.d(TAG, "timeline url: " + apiUrl.toString() + "?" + params.toString());
+		Log.d(TAG, "home timeline url: " + apiUrl.toString() + "?" + params.toString());
 		getClient().get(apiUrl, params, handler);
+	}
+
+    public void getMentionsTimeline(PageType page, AsyncHttpResponseHandler handler) {
+        String apiUrl = getApiUrl("statuses/mentions_timeline.json");
+        // Set the url params
+        RequestParams params = new RequestParams();
+        params.put("count", REST_TWEET_COUNT);
+        if (page == PageType.FIRST) {
+            params.put("since_id", 1);
+        } else if( page == PageType.NEXT) {
+            params.put("max_id", Tweet.getMax_id() - 1);
+        }
+
+        // Execute the request
+        Log.d(TAG, "mentions timeline url: " + apiUrl.toString() + "?" + params.toString());
+        getClient().get(apiUrl, params, handler);
+    }
+
+
+	public void getUserTimeline(String screenName, PageType page, AsyncHttpResponseHandler handler) {
+		String apiUrl = getApiUrl("statuses/user_timeline.json");
+		// Set the url params
+		RequestParams params = new RequestParams();
+
+        if (screenName != null) {
+            params.put("screen_name", screenName);
+        }
+
+		params.put("count", REST_TWEET_COUNT);
+		if (page == PageType.FIRST) {
+			params.put("since_id", 1);
+		} else if( page == PageType.NEXT) {
+			params.put("max_id", Tweet.getMax_id() - 1);
+		}
+
+		// Execute the request
+		Log.d(TAG, "user timeline url: " + apiUrl.toString() + "?" + params.toString());
+		getClient().get(apiUrl, params, handler);
+	}
+
+	public void getUserInfo (String screenName, AsyncHttpResponseHandler handler) {
+        String apiUrl = null;
+        RequestParams params = null;
+
+        if(screenName == null) {
+            // show self profilr
+            apiUrl = getApiUrl("account/verify_credentials.json");
+            Log.d(TAG, "profile url: " + apiUrl.toString());
+        } else {
+            // show user profilr
+            apiUrl = getApiUrl("users/show.json");
+            params = new RequestParams();
+            params.put("screen_name", screenName);
+            Log.d(TAG, "profile url: " + apiUrl.toString() + "?" + params.toString());
+        }
+
+        getClient().get(apiUrl, params, handler);
 	}
 
 

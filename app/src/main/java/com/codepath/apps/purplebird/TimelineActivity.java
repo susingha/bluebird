@@ -1,8 +1,12 @@
 package com.codepath.apps.purplebird;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -10,50 +14,77 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.Toast;
 
+import com.astuetz.PagerSlidingTabStrip;
+import com.codepath.apps.purplebird.fragments.ActivityCommunicator;
+import com.codepath.apps.purplebird.fragments.HomeTimelineFragment;
+import com.codepath.apps.purplebird.fragments.MentionsTimelineFragment;
 import com.codepath.apps.purplebird.models.Tweet;
+import com.codepath.apps.purplebird.models.User;
 import com.loopj.android.http.JsonHttpResponseHandler;
 
-import org.apache.commons.io.FileUtils;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
 import cz.msebera.android.httpclient.Header;
 
-public class TimelineActivity extends AppCompatActivity {
+public class TimelineActivity extends AppCompatActivity implements ActivityCommunicator {
 
-    private static String TAG = "sup: TimelineActivity";
-    private static final String PERSIST_FILE = "lastTweetsArray.txt";
-    TwitterNetworkClient client;
-    ArrayList<Tweet> tweets;
-    TweetsArrayAdapter aTweets;
-    ListView lvTweets;
-    SwipeRefreshLayout swipeContainer;
-    ArrayList<Tweet> newTweetsArrayRef = null;
-    MenuItem itCompose;
+    String TAG = "sup: TimelineActivity";
     String COMPOSE_TAG = "COMPOSE_TAG";
+    MenuItem itCompose;
     EditText etCompose;
-    String status;
     ComposeFragment fgCompose;
     FragmentTransaction ftCompose;
+    String status;
+    private TwitterNetworkClient client;
 
-    // < TEMP CODE //
-    ArrayList<Tweet> lastTweetsArray;
-    //  TEMP CODE > //
+    HomeTimelineFragment homeTimelineFragment;
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_timeline);
+
+        client = TwitterApp.getRestClient();
+
+        ViewPager vpPager = (ViewPager) findViewById(R.id.viewpager);
+        vpPager.setAdapter(new TweetsPagerAdapter(getSupportFragmentManager()));
+        PagerSlidingTabStrip tabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        tabStrip.setViewPager(vpPager);
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.timeline, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    public void onComposeView(MenuItem menuItem) {
+        Log.d(TAG, "onComposeView");
+
+        // Launch the Compose Fragment
+        ftCompose = getSupportFragmentManager().beginTransaction();
+        fgCompose = new ComposeFragment();
+        ftCompose.add(R.id.frComposePlaceHolder, fgCompose, COMPOSE_TAG); // may also use replace
+        ftCompose.addToBackStack(null);
+        ftCompose.commit();
+    }
+
+    public void onProfileView(MenuItem menuItem) {
+        Log.d(TAG, "onProfileView");
+
+        // launch the profile activity
+        Intent i = new Intent(this, ProfileActivity.class);
+        startActivity(i);
     }
 
     public void onSendTweet(View v) {
@@ -74,31 +105,17 @@ public class TimelineActivity extends AppCompatActivity {
         updateStatus(status);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.itCompose) {
-            Log.d(TAG, "Compose");
-
-            ftCompose = getSupportFragmentManager().beginTransaction();
-            fgCompose = new ComposeFragment();
-//          ftCompose.replace(R.id.frComposePlaceHolder, new ComposeFragment());
-            ftCompose.add(R.id.frComposePlaceHolder, fgCompose, COMPOSE_TAG);
-            ftCompose.addToBackStack(null);
-            ftCompose.commit();
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
     public void updateStatus(String status) {
         client.postComposeTweet(status, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d(TAG, "update - onSuccess");
-                lvTweets.smoothScrollToPosition(0);
-
                 Tweet newTweet = Tweet.fromJSON(response);
-                tweets.add(0, newTweet);
-                aTweets.notifyDataSetChanged();
+                if (homeTimelineFragment != null)
+                    homeTimelineFragment.addTweetOnTop(newTweet);
+                else
+                    Log.d(TAG, "updateStatus onSuccess homeTimelineFragment is null");
                 super.onSuccess(statusCode, headers, response);
             }
 
@@ -126,117 +143,46 @@ public class TimelineActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_timeline);
+    // Return the order of fragments in the view pager
+    public class TweetsPagerAdapter extends FragmentPagerAdapter {
+        private String tabTitles[] = {"Home", "Mentions"};
 
-        setupViews();
-        populateTimeline(PageType.FIRST);
-    }
-
-
-    private void setupViews() {
-        // construct the adapter
-        lvTweets = (ListView) findViewById(R.id.lvTweets);
-        tweets = new ArrayList<>();
-        aTweets = new TweetsArrayAdapter(this, tweets);
-
-        lvTweets.setAdapter(aTweets);
-        lvTweets.setOnScrollListener(new EndlessScrollListener() {
-            @Override
-            public boolean onLoadMore(int page, int totalItemsCount) {
-                populateTimeline(PageType.NEXT);
-                return true;
-            }
-        });
-
-        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
-        swipeContainer.setEnabled(false);
-        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                populateTimeline(PageType.FIRST);
-            }
-        });
-
-        client = TwitterApp.getRestClient();
-        lastTweetsArray = new ArrayList<>();
-    }
-
-    private void populateTimeline(PageType page) {
-
-        // If requesting first page, reset adapter steps
-        final PageType page_t = page;
-        if (page == PageType.FIRST) {
-            tweets.clear();
-            aTweets.notifyDataSetChanged();
+        // Get the manager
+        public TweetsPagerAdapter(FragmentManager fm) {
+            super(fm);
         }
 
-        client.getHomeTimeline(page, new JsonHttpResponseHandler() {
-
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
-                Log.d(TAG, "home_timeline - onSuccess");
-                Toast.makeText(getApplicationContext(), "Next Page Loading", Toast.LENGTH_SHORT).show();
-
-                newTweetsArrayRef = Tweet.fromJSONArray(response);
-                aTweets.addAll(newTweetsArrayRef);
-
-                // Save the json in persistent storage
-                if(page_t == PageType.FIRST) {
-                    lastTweetsArray.clear();
-                    lastTweetsArray.addAll(newTweetsArrayRef);
-                    File filesDir = getFilesDir();
-                    File todoFile = new File(filesDir, PERSIST_FILE);
-                    try {
-                        // FileUtils.writeLines(todoFile, lastTweetsArray);
-                        FileUtils.writeStringToFile(todoFile, response.toString());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                swipeContainer.setRefreshing(false);
-                swipeContainer.setEnabled(true);
+        @Override
+        public Fragment getItem(int position) {
+            Log.d(TAG, "getItem position: " + position);
+            if (position == 0) {
+                homeTimelineFragment = new HomeTimelineFragment();
+                return homeTimelineFragment;
+            } else if (position == 1) {
+                return new MentionsTimelineFragment();
+            } else {
+                return null;
             }
+        }
 
-            @Override
-            public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
-                Log.d(TAG, "home_timeline - onFailure");
-                Toast.makeText(getApplicationContext(), "API Rate Limited. Loading from storage", Toast.LENGTH_SHORT).show();
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return tabTitles[position];
+        }
 
-                if(page_t == PageType.FIRST) {
-                    // Check if we have stored json in persistent storage
-                    if (lastTweetsArray.isEmpty()) {
-                        File filesDir = getFilesDir();
-                        File todoFile = new File(filesDir, PERSIST_FILE);
-                        try {
-                            String json = FileUtils.readFileToString(todoFile).toString();
-                            try {
-                                JSONArray jsonArray = new JSONArray(json);
-                                newTweetsArrayRef = Tweet.fromJSONArray(jsonArray);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } else {
-                        newTweetsArrayRef = lastTweetsArray;
-                    }
+        @Override
+        public int getCount() {
+            return tabTitles.length;
+        }
+    }
 
-                    // Retrieve json from Persistent storage and show on screen
-                    aTweets.addAll(newTweetsArrayRef);
-                } else {
-                    Toast.makeText(getApplicationContext(), "API Rate Limited. Cannot load more", Toast.LENGTH_SHORT).show();
-                    aTweets.notifyDataSetChanged();
-                }
-
-                swipeContainer.setRefreshing(false);
-                swipeContainer.setEnabled(true);
-            }
-        });
-
+    public void launchProfileActivity(User user) {
+        Log.d(TAG, "User: " + user.getScreenName());
+/*
+        // This did not work. It kept crashing in TweetsListFragment.java - callingContext = (ActivityCommunicator) context;
+        Intent i = new Intent(this, ProfileActivity.class);
+        i.putExtra("screen_name", user.getScreenName().toString());
+        startActivity(i);
+*/
     }
 }

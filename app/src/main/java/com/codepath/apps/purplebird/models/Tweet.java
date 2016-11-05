@@ -53,15 +53,25 @@ public class Tweet {
         long diffDays = diff / (24 * 60 * 60 * 1000);
 
         StringBuilder elapsedString = new StringBuilder();
+        int stampCounter = 2;
 
-        if (diffDays > 0)
-            elapsedString.append(diffDays + " Days ");
-        if (diffHours > 0)
-            elapsedString.append(diffHours + " Hours ");
-        if (diffMinutes > 0)
-            elapsedString.append(diffMinutes + " Minutes ");
+        if (diffDays > 0 && stampCounter != 0) {
+            elapsedString.append(diffDays + "d ");
+            stampCounter--;
+        }
+        if (diffHours > 0 && stampCounter != 0) {
+            elapsedString.append(diffHours + "h ");
+            stampCounter--;
+        }
+        if (diffMinutes > 0 && stampCounter != 0) {
+            elapsedString.append(diffMinutes + "m ");
+            stampCounter--;
+        }
+        if (diffSeconds > 0 && stampCounter != 0) {
+            elapsedString.append(diffSeconds + "s ");
+            stampCounter--;
+        }
 
-        elapsedString.append(diffSeconds + " Seconds ");
         elapsedString.append("ago");
 
         Log.d(TAG, diffDays + " days, " + diffHours + " hours, " + diffMinutes + " minutes, " + diffSeconds + " seconds.");
