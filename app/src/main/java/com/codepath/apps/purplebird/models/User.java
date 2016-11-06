@@ -8,12 +8,13 @@ import org.json.JSONObject;
  */
 
 public class User {
-    public String getName() {
-        return name;
-    }
 
     public long getUid() {
         return uid;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getScreenName() {
@@ -22,6 +23,10 @@ public class User {
 
     public String getProfileImageUrl() {
         return profileImageUrl;
+    }
+
+    public int getTweetsCount() {
+        return tweetsCount;
     }
 
     public int getFollowingCount() {
@@ -42,10 +47,8 @@ public class User {
     private String screenName;
     private String profileImageUrl;
     private String tagline;
+    private int tweetsCount;
     private int followerCount;
-
-
-
     private int followingCount;
 
     // Deserialize
@@ -57,9 +60,9 @@ public class User {
             u.screenName = json.getString("screen_name");
             u.profileImageUrl = json.getString("profile_image_url");
             u.tagline = json.getString("description");
+            u.tweetsCount = json.getInt("statuses_count");
             u.followerCount = json.getInt("followers_count");
             u.followingCount = json.getInt("friends_count");
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

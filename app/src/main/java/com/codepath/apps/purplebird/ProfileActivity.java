@@ -81,12 +81,14 @@ public class ProfileActivity extends AppCompatActivity {
     private void populateProfileHeader(User user) {
         TextView tvName = (TextView) findViewById(R.id.tvName);
         TextView tvTagLine = (TextView) findViewById(R.id.tvTagline);
+        TextView tvTweets = (TextView) findViewById(R.id.tvTweets);
         TextView tvFollowers = (TextView) findViewById(R.id.tvFollowers);
         TextView tvFollowing = (TextView) findViewById(R.id.tvFollowing);
         ImageView ivPorfileImage = (ImageView) findViewById(R.id.ivProfileImage);
 
         tvName.setText(user.getName());
         tvTagLine.setText(user.getTagLine());
+        tvTweets.setText(user.getTweetsCount() + " Tweets");
         tvFollowers.setText(user.getFollowersCount() + " Followers");
         tvFollowing.setText(user.getFollowingCount() + " Following");
         Picasso.with(this).load(user.getProfileImageUrl()).transform(new RoundedCornersTransformation(5, 5)).into(ivPorfileImage);

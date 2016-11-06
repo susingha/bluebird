@@ -147,7 +147,7 @@ public abstract class TweetsListFragment extends Fragment {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray response) {
                 Log.d(TAG, "onSuccess");
-                Toast.makeText(getActivity(), "Next Page Loading", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), "Loading", Toast.LENGTH_SHORT).show();
 
                 addAll(Tweet.fromJSONArray(response, objMaxId));
 
@@ -165,7 +165,7 @@ public abstract class TweetsListFragment extends Fragment {
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
-                Log.d(TAG, "home_timeline - onFailure");
+                Log.d(TAG, "onFailure");
                 if (statusCode == TwitterNetworkClient.REST_NO_INTERNET_STATUS_CODE) {
                     Toast.makeText(getActivity(), "NO INTERNET. Loading from storage", Toast.LENGTH_SHORT).show();
                 } else {
@@ -189,7 +189,7 @@ public abstract class TweetsListFragment extends Fragment {
                         e.printStackTrace();
                     }
                 } else {
-                    Toast.makeText(getActivity(), "API Rate Limited. Cannot load more", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Cannot load more", Toast.LENGTH_SHORT).show();
                 }
             }
         }, screenName);
