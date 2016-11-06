@@ -2,6 +2,8 @@ package com.codepath.apps.purplebird.models;
 
 import android.util.Log;
 
+import com.codepath.apps.purplebird.fragments.TweetsListFragment;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -82,12 +84,7 @@ public class Tweet {
         return user;
     }
 
-    public static Long getMax_id() {
-        return max_id;
-    }
-
     // Attributes
-    private static Long max_id = Long.valueOf(0);
     private Long uid; // data base id for the tweet
     private String body;
     private String createdAt;
@@ -111,17 +108,17 @@ public class Tweet {
         return tweet;
     }
 
-    public static ArrayList<Tweet> fromJSONArray(JSONArray jsonArray) {
+    public static ArrayList<Tweet> fromJSONArray(JSONArray jsonArray, TweetsListFragment.ObjMaxId objMaxId) {
         ArrayList<Tweet> tweets = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject tweetJson = jsonArray.getJSONObject(i);
                 Tweet tweet = Tweet.fromJSON(tweetJson);
                 if (tweet != null) {
-                    Log.d(TAG, "new tweet id: " + tweet.uid);
-                    if (max_id > tweet.uid || max_id == 0) {
-                        max_id = tweet.uid;
-                        Log.d(TAG, "max_id updated to: " + max_id);
+//                  Log.d(TAG, "new tweet id: " + tweet.uid);
+                    if (objMaxId.max_id > tweet.uid || objMaxId.max_id == 0) {
+                        objMaxId.max_id = tweet.uid;
+//                      Log.d(TAG, "max_id updated to: " + objMaxId.max_id);
                     }
                     tweets.add(tweet);
                 }
