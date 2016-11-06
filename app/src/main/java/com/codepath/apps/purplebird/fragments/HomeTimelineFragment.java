@@ -38,7 +38,6 @@ public class HomeTimelineFragment extends TweetsListFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         client = TwitterApp.getRestClient();
-        populateTimeline(TwitterNetworkClient.PageType.FIRST, CACHE_FILE);
     }
 
     public void populateTimeline(TwitterNetworkClient.PageType page, final String cacheFile) {
@@ -73,7 +72,11 @@ public class HomeTimelineFragment extends TweetsListFragment {
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject response) {
                 Log.d(TAG, "home_timeline - onFailure");
-                Toast.makeText(getActivity(), "API Rate Limited. Loading from storage", Toast.LENGTH_SHORT).show();
+                if(statusCode == TwitterNetworkClient.REST_NO_INTERNET_STATUS_CODE) {
+                    Toast.makeText(getActivity(), "NO INTERNET. Loading from storage", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "API Rate Limited. Loading from storage", Toast.LENGTH_SHORT).show();
+                }
 
                 if(page_t == TwitterNetworkClient.PageType.FIRST) {
                     // Check if we have stored json in persistent storage

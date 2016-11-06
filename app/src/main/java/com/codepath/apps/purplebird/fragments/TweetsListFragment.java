@@ -49,6 +49,7 @@ public abstract class TweetsListFragment extends Fragment {
         lvTweets.setOnScrollListener(new EndlessScrollListener() {
             @Override
             public boolean onLoadMore(int page, int totalItemsCount) {
+                Log.d(TAG, "sup: onLoadMore page: " + page);
                 populateTimeline(TwitterNetworkClient.PageType.NEXT, getCACHE_FILE());
                 return true;
             }
@@ -73,6 +74,8 @@ public abstract class TweetsListFragment extends Fragment {
                 populateTimeline(TwitterNetworkClient.PageType.FIRST, getCACHE_FILE());
             }
         });
+
+        populateTimeline(TwitterNetworkClient.PageType.FIRST, getCACHE_FILE());
         return v;
     }
 

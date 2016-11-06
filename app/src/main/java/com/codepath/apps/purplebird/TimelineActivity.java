@@ -122,22 +122,25 @@ public class TimelineActivity extends AppCompatActivity implements ActivityCommu
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.d(TAG, "update - onFailure sup:1");
+                if(statusCode == TwitterNetworkClient.REST_NO_INTERNET_STATUS_CODE)
+                    return;
                 Toast.makeText(getApplicationContext(), "API Rate Limit Exceeded", Toast.LENGTH_SHORT).show();
-                super.onFailure(statusCode, headers, throwable, errorResponse);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 Log.d(TAG, "update - onFailure sup:2");
+                if(statusCode == TwitterNetworkClient.REST_NO_INTERNET_STATUS_CODE)
+                    return;
                 Toast.makeText(getApplicationContext(), "API Rate Limit Exceeded", Toast.LENGTH_SHORT).show();
-                super.onFailure(statusCode, headers, throwable, errorResponse);
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Log.d(TAG, "update - onFailure sup:3");
+                if(statusCode == TwitterNetworkClient.REST_NO_INTERNET_STATUS_CODE)
+                    return;
                 Toast.makeText(getApplicationContext(), "API Rate Limit Exceeded", Toast.LENGTH_SHORT).show();
-                super.onFailure(statusCode, headers, responseString, throwable);
             }
         });
     }

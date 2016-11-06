@@ -1,6 +1,8 @@
 package com.codepath.apps.purplebird;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.codepath.apps.purplebird.models.Tweet;
@@ -27,31 +29,30 @@ import static com.raizlabs.android.dbflow.config.FlowLog.TAG;
  */
 
 
-
 public class TwitterNetworkClient extends OAuthBaseClient {
 
 
-	public enum PageType {
-		FIRST,
-		NEXT,
-	}
+    public enum PageType {
+        FIRST,
+        NEXT,
+    }
 
-	public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
-	public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
-	public static final String REST_CONSUMER_KEY = "NelFk49mtKeK3SbceWJomihfi";       // Change this
-	public static final String REST_CONSUMER_SECRET = "VgA77OCHM3lKaQWdcBIngv1oWxnJf1uk4foGgM8STN8zyCu3BI"; // Change this
-	public static final String REST_CALLBACK_URL = "oauth://cppurplebird"; // Change this (here and in manifest)
+    public static final Class<? extends Api> REST_API_CLASS = TwitterApi.class; // Change this
+    public static final String REST_URL = "https://api.twitter.com/1.1"; // Change this, base API URL
+    public static final String REST_CONSUMER_KEY = "NelFk49mtKeK3SbceWJomihfi";       // Change this
+    public static final String REST_CONSUMER_SECRET = "VgA77OCHM3lKaQWdcBIngv1oWxnJf1uk4foGgM8STN8zyCu3BI"; // Change this
+    public static final String REST_CALLBACK_URL = "oauth://cppurplebird"; // Change this (here and in manifest)
     public static final int REST_TWEET_COUNT = 25;
+    public static final int REST_NO_INTERNET_STATUS_CODE = 999;
 
 
-
-	public TwitterNetworkClient(Context context) {
-		super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
-	}
+    public TwitterNetworkClient(Context context) {
+        super(context, REST_API_CLASS, REST_URL, REST_CONSUMER_KEY, REST_CONSUMER_SECRET, REST_CALLBACK_URL);
+    }
 
 
 /*
-	// CHANGE THIS
+    // CHANGE THIS
 	// DEFINE METHODS for different API endpoints here
 	public void getInterestingnessList(AsyncHttpResponseHandler handler) {
 		String apiUrl = getApiUrl("?nojsoncallback=1&method=flickr.interestingness.getList");
@@ -62,40 +63,61 @@ public class TwitterNetworkClient extends OAuthBaseClient {
 	}
 */
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
+
     public void postComposeTweet(String status, AsyncHttpResponseHandler handler) {
         String apiUrl = getApiUrl("statuses/update.json");
         RequestParams params = new RequestParams();
-        params.put("status",status);
+        params.put("status", status);
 
         // Execute the request
         Log.d(TAG, "compose url: " + apiUrl.toString() + "?" + params.toString());
         getClient().post(apiUrl, params, handler);
     }
 
-	public void getHomeTimeline(PageType page, AsyncHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("statuses/home_timeline.json");
-		// Set the url params
-		RequestParams params = new RequestParams();
-		params.put("count", REST_TWEET_COUNT);
-		if (page == PageType.FIRST) {
-			params.put("since_id", 1);
-		} else if( page == PageType.NEXT) {
-			params.put("max_id", Tweet.getMax_id() - 1);
-		}
+    public void getHomeTimeline(PageType page, AsyncHttpResponseHandler handler) {
 
-		// Execute the request
-		Log.d(TAG, "home timeline url: " + apiUrl.toString() + "?" + params.toString());
-		getClient().get(apiUrl, params, handler);
-	}
+        if (isNetworkAvailable() == false) {
+            Log.d(TAG, "NO INTERNET");
+            handler.onFailure(REST_NO_INTERNET_STATUS_CODE, null, null, null);
+            return;
+        }
+
+        String apiUrl = getApiUrl("statuses/home_timeline.json");
+        // Set the url params
+        RequestParams params = new RequestParams();
+        params.put("count", REST_TWEET_COUNT);
+        if (page == PageType.FIRST) {
+            params.put("since_id", 1);
+        } else if (page == PageType.NEXT) {
+            params.put("max_id", Tweet.getMax_id() - 1);
+        }
+
+        // Execute the request
+        Log.d(TAG, "home timeline url: " + apiUrl.toString() + "?" + params.toString());
+        getClient().get(apiUrl, params, handler);
+    }
 
     public void getMentionsTimeline(PageType page, AsyncHttpResponseHandler handler) {
+
+        if (isNetworkAvailable() == false) {
+            Log.d(TAG, "NO INTERNET");
+            handler.onFailure(REST_NO_INTERNET_STATUS_CODE, null, null, null);
+            return;
+        }
+
         String apiUrl = getApiUrl("statuses/mentions_timeline.json");
         // Set the url params
         RequestParams params = new RequestParams();
         params.put("count", REST_TWEET_COUNT);
         if (page == PageType.FIRST) {
             params.put("since_id", 1);
-        } else if( page == PageType.NEXT) {
+        } else if (page == PageType.NEXT) {
             params.put("max_id", Tweet.getMax_id() - 1);
         }
 
@@ -105,32 +127,46 @@ public class TwitterNetworkClient extends OAuthBaseClient {
     }
 
 
-	public void getUserTimeline(String screenName, PageType page, AsyncHttpResponseHandler handler) {
-		String apiUrl = getApiUrl("statuses/user_timeline.json");
-		// Set the url params
-		RequestParams params = new RequestParams();
+    public void getUserTimeline(String screenName, PageType page, AsyncHttpResponseHandler handler) {
+
+        if (isNetworkAvailable() == false) {
+            Log.d(TAG, "NO INTERNET");
+            handler.onFailure(REST_NO_INTERNET_STATUS_CODE, null, null, null);
+            return;
+        }
+
+        String apiUrl = getApiUrl("statuses/user_timeline.json");
+        // Set the url params
+        RequestParams params = new RequestParams();
 
         if (screenName != null) {
             params.put("screen_name", screenName);
         }
 
-		params.put("count", REST_TWEET_COUNT);
-		if (page == PageType.FIRST) {
-			params.put("since_id", 1);
-		} else if( page == PageType.NEXT) {
-			params.put("max_id", Tweet.getMax_id() - 1);
-		}
+        params.put("count", REST_TWEET_COUNT);
+        if (page == PageType.FIRST) {
+            params.put("since_id", 1);
+        } else if (page == PageType.NEXT) {
+            params.put("max_id", Tweet.getMax_id() - 1);
+        }
 
-		// Execute the request
-		Log.d(TAG, "user timeline url: " + apiUrl.toString() + "?" + params.toString());
-		getClient().get(apiUrl, params, handler);
-	}
+        // Execute the request
+        Log.d(TAG, "user timeline url: " + apiUrl.toString() + "?" + params.toString());
+        getClient().get(apiUrl, params, handler);
+    }
 
-	public void getUserInfo (String screenName, AsyncHttpResponseHandler handler) {
+    public void getUserInfo(String screenName, AsyncHttpResponseHandler handler) {
+
+        if (isNetworkAvailable() == false) {
+            Log.d(TAG, "NO INTERNET");
+            handler.onFailure(REST_NO_INTERNET_STATUS_CODE, null, null, null);
+            return;
+        }
+
         String apiUrl = null;
         RequestParams params = null;
 
-        if(screenName == null) {
+        if (screenName == null) {
             // show self profilr
             apiUrl = getApiUrl("account/verify_credentials.json");
             Log.d(TAG, "profile url: " + apiUrl.toString());
@@ -143,7 +179,7 @@ public class TwitterNetworkClient extends OAuthBaseClient {
         }
 
         getClient().get(apiUrl, params, handler);
-	}
+    }
 
 
 	/* 1. Define the endpoint URL with getApiUrl and pass a relative path to the endpoint

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codepath.apps.purplebird.fragments.UserTimeLineFragment;
 import com.codepath.apps.purplebird.models.User;
@@ -45,19 +46,25 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onFailure(int statusCode, Header[] headers, String responseString, Throwable throwable) {
                 Log.d(TAG, "sup:1 onFailure");
-                super.onFailure(statusCode, headers, responseString, throwable);
+                if(statusCode == TwitterNetworkClient.REST_NO_INTERNET_STATUS_CODE)
+                    return;
+                Toast.makeText(getApplicationContext(), "API Rate Limit Exceeded", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 Log.d(TAG, "sup:2 onFailure");
-                super.onFailure(statusCode, headers, throwable, errorResponse);
+                if(statusCode == TwitterNetworkClient.REST_NO_INTERNET_STATUS_CODE)
+                    return;
+                Toast.makeText(getApplicationContext(), "API Rate Limit Exceeded", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, Throwable throwable, JSONObject errorResponse) {
                 Log.d(TAG, "sup:3 onFailure");
-                super.onFailure(statusCode, headers, throwable, errorResponse);
+                if(statusCode == TwitterNetworkClient.REST_NO_INTERNET_STATUS_CODE)
+                    return;
+                Toast.makeText(getApplicationContext(), "API Rate Limit Exceeded", Toast.LENGTH_SHORT).show();
             }
         });
 
