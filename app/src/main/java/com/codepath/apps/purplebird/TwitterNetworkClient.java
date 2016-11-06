@@ -183,8 +183,36 @@ public class TwitterNetworkClient extends OAuthBaseClient {
         getClient().get(apiUrl, params, handler);
     }
 
+    public void getSearchTimeline(PageType page, Long max_id, AsyncHttpResponseHandler handler, String searchQuery) {
 
-    public void getTimeline(TweetsListFragment.TimelineType timelineType_t, PageType page, Long max_id, AsyncHttpResponseHandler handler, String screenName) {
+        if (isNetworkAvailable() == false) {
+            Log.d(TAG, "NO INTERNET");
+            handler.onFailure(REST_NO_INTERNET_STATUS_CODE, null, null, null);
+            return;
+        }
+
+        String apiUrl = getApiUrl("search/tweets.json");
+        // Set the url params
+        RequestParams params = new RequestParams();
+
+        if (searchQuery != null) {
+            params.put("q", searchQuery);
+        }
+
+        params.put("count", REST_TWEET_COUNT);
+        if (page == PageType.FIRST) {
+            params.put("since_id", 1);
+        } else if (page == PageType.NEXT) {
+            params.put("max_id", max_id - 1);
+        }
+
+        // Execute the request
+        Log.d(TAG, "search timeline url: " + apiUrl.toString() + "?" + params.toString());
+        getClient().get(apiUrl, params, handler);
+    }
+
+
+    public void getTimeline(TweetsListFragment.TimelineType timelineType_t, PageType page, Long max_id, AsyncHttpResponseHandler handler, String generic_string) {
         switch (timelineType_t) {
             case TIMELINE_HOME:
                 getHomeTimeline(page, max_id, handler);
@@ -193,7 +221,10 @@ public class TwitterNetworkClient extends OAuthBaseClient {
                 getMentionsTimeline(page, max_id, handler);
                 break;
             case TIMELINE_USER:
-                getUserTimeline(page, max_id, handler, screenName);
+                getUserTimeline(page, max_id, handler, generic_string);
+                break;
+            case TIMELINE_SEARCH:
+                getSearchTimeline(page, max_id, handler, generic_string);
                 break;
             default:
                 Log.d(TAG, "Timeline Support not available");

@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
@@ -60,6 +61,24 @@ public class TimelineActivity extends AppCompatActivity implements ActivityCommu
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.timeline, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.itSearch);  // (MenuItem) findViewById(R.id.itSearch);
+        final SearchView searchView = (SearchView) menuItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Log.d(TAG, "onQueryTextSubmit searching for : " + query);
+                searchView.clearFocus();
+                onSearchAction(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -85,6 +104,15 @@ public class TimelineActivity extends AppCompatActivity implements ActivityCommu
         // launch the profile activity
         Intent i = new Intent(this, ProfileActivity.class);
         startActivity(i);
+    }
+
+    public void onSearchAction (String query) {
+        Log.d(TAG, "onSearchAction");
+
+        Intent i = new Intent(this, SearchActivity.class);
+        i.putExtra("search_query", query);
+        startActivity(i);
+
     }
 
     public void onSendTweet(View v) {

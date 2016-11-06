@@ -51,6 +51,7 @@ public abstract class TweetsListFragment extends Fragment {
         TIMELINE_HOME,
         TIMELINE_MENTIONS,
         TIMELINE_USER,
+        TIMELINE_SEARCH,
     }
 
     ActivityCommunicator callingContext;
@@ -60,7 +61,7 @@ public abstract class TweetsListFragment extends Fragment {
     SwipeRefreshLayout swipeContainer;
     private TwitterNetworkClient client;
     ObjMaxId objMaxId = new ObjMaxId();
-    String screenName = null;
+    String generic_string = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup parent, @Nullable Bundle savedInstanceState) {
@@ -140,7 +141,9 @@ public abstract class TweetsListFragment extends Fragment {
         }
 
         if (timelineType_t == TimelineType.TIMELINE_USER)
-            screenName = getArguments().getString("screen_name");
+            generic_string = getArguments().getString("screen_name");
+        else if(timelineType_t == TimelineType.TIMELINE_SEARCH)
+            generic_string = getArguments().getString("search_query");
 
         client.getTimeline(timelineType_t, page, objMaxId.max_id, new JsonHttpResponseHandler() {
 
@@ -160,6 +163,16 @@ public abstract class TweetsListFragment extends Fragment {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                }
+            }
+
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                try {
+                    JSONArray jsonArray = response.getJSONArray("statuses");
+                    onSuccess(statusCode, headers, jsonArray);
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
             }
 
@@ -192,7 +205,7 @@ public abstract class TweetsListFragment extends Fragment {
                     Toast.makeText(getActivity(), "Cannot load more", Toast.LENGTH_SHORT).show();
                 }
             }
-        }, screenName);
+        }, generic_string);
     }
 
     public abstract String getCACHE_FILE();
