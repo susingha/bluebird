@@ -1,6 +1,8 @@
 package com.codepath.apps.purplebird;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,11 +11,13 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.codepath.apps.purplebird.models.Tweet;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import jp.wasabeef.picasso.transformations.RoundedCornersTransformation;
 
@@ -39,8 +43,9 @@ public class TweetsArrayAdapter extends ArrayAdapter<Tweet> {
 
     @NonNull
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Tweet tweet = getItem(position);
+    public View getView(int position, View convertView, final ViewGroup parent) {
+        final int position_l = position;
+        final Tweet tweet = getItem(position);
         ViewHolder viewHolder = null;
         Log.d(TAG, "getView for position " + position);
 
@@ -63,11 +68,43 @@ public class TweetsArrayAdapter extends ArrayAdapter<Tweet> {
 
         viewHolder = (ViewHolder) convertView.getTag();
         Picasso.with(getContext()).load(tweet.getUser().getProfileImageUrl()).transform(new RoundedCornersTransformation(5, 5)).into(viewHolder.ivProfileImage);
+        viewHolder.ivProfileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "position: " + position_l + " user: " + tweet.getUser().getScreenName());
+                Intent i = new Intent(parent.getContext(), ProfileActivity.class);
+                i.putExtra("screen_name", tweet.getUser().getScreenName());
+                parent.getContext().startActivity(i);
+            }
+        });
         viewHolder.tvName.setText(tweet.getUser().getName());
         viewHolder.tvUserName.setText("@" + tweet.getUser().getScreenName());
         viewHolder.tvBody.setText(tweet.getBody());
         viewHolder.tvTimeStamp.setText(tweet.getTimeStamp());
         viewHolder.tvId.setText(tweet.getUid().toString());
+
+
+        new PatternEditableBuilder().
+                addPattern(Pattern.compile("(\\@|\\#)(\\w+)"), Color.BLUE,
+                        new PatternEditableBuilder.SpannableClickedListener() {
+                            @Override
+                            public void onSpanClicked(String text) {
+                                String generic_string = text.substring(1);
+                                if (text.charAt(0) == '@') {
+                                    Toast.makeText(parent.getContext(), "Loading Profile: " + generic_string, Toast.LENGTH_SHORT).show();
+                                    Intent i = new Intent(parent.getContext(), ProfileActivity.class);
+                                    i.putExtra("screen_name", generic_string);
+                                    parent.getContext().startActivity(i);
+                                } else if (text.charAt(0) == '#') {
+                                    Toast.makeText(parent.getContext(), "Loading Search: " + generic_string, Toast.LENGTH_SHORT).show();
+                                    Intent i = new Intent(parent.getContext(), SearchActivity.class);
+                                    i.putExtra("search_query", generic_string);
+                                    parent.getContext().startActivity(i);
+                                }
+                            }
+                        }).into(viewHolder.tvBody);
+
+
 
         return convertView;
     }

@@ -41,7 +41,6 @@ public class TimelineActivity extends AppCompatActivity implements ActivityCommu
     String status;
     private TwitterNetworkClient client;
 
-    PagerSlidingTabStrip tabStrip;
     HomeTimelineFragment homeTimelineFragment;
 
     @Override
@@ -53,7 +52,7 @@ public class TimelineActivity extends AppCompatActivity implements ActivityCommu
 
         ViewPager vpPager = (ViewPager) findViewById(R.id.viewpager);
         vpPager.setAdapter(new TweetsPagerAdapter(getSupportFragmentManager()));
-        tabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
+        PagerSlidingTabStrip tabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         tabStrip.setViewPager(vpPager);
 
     }
