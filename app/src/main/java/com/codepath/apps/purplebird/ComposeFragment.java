@@ -86,7 +86,7 @@ public class ComposeFragment extends Fragment {
                 Log.d(TAG, "sup: " + tvCounter.getText().toString());
                 tvCounter.setText(charCount.toString() + "/140");
 
-                if(charCount > LIMIT_140) {
+                if(charCount > LIMIT_140 || charCount == 0) {
                     Log.d(TAG, "RED");
                     tvCounter.setTextColor(Color.parseColor(COLOR_RED));
                     btnSend.setEnabled(false);

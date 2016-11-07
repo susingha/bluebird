@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="3dp">
+
+    <ImageView
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_launcher"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/ivProfileImageU"
+        android:layout_width="wrap_content"
+        android:minHeight="70dp"
+        android:minWidth="70dp"
+        android:focusable="false"
+        android:scaleType="fitXY" />
+
+    <TextView
+        android:text="Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/ivProfileImageU"
+        android:layout_toEndOf="@+id/ivProfileImageU"
+        android:id="@+id/tvNameU"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        android:paddingBottom="5dp"
+        android:textStyle="normal|bold"
+        android:textAllCaps="false"
+        android:textSize="16sp" />
+
+    <TextView
+        android:text="\@username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/tvName"
+        android:layout_alignTop="@id/tvName"
+        android:gravity="center"
+        android:layout_toRightOf="@+id/tvNameU"
+        android:layout_toEndOf="@+id/tvNameU"
+        android:id="@+id/tvUserNameU"
+        android:layout_marginLeft="5dp"
+        android:paddingBottom="5dp"
+        android:textColor="@android:color/darker_gray" />
+
+    <TextView
+        android:text="Body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvNameU"
+        android:layout_toRightOf="@+id/ivProfileImageU"
+        android:layout_toEndOf="@+id/ivProfileImageU"
+        android:id="@+id/tvBodyU"
+        android:autoLink="web"
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvBodyU"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"
+        android:id="@+id/tvTimeStampU"
+        android:visibility="gone" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvIdU"
+        android:layout_below="@+id/tvTimeStampU"
+        android:layout_toRightOf="@+id/ivProfileImageU"
+        android:layout_toEndOf="@+id/ivProfileImageU"
+        android:visibility="gone"/>
+
+
+</RelativeLayout>

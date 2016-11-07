@@ -14,6 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/activity_vertical_margin"
+            android:layout_centerHorizontal="true"
             android:text="@string/new_tweet" />
 
         <EditText
@@ -32,7 +33,8 @@
             android:layout_margin="@dimen/activity_vertical_margin"
             android:background="@android:color/holo_blue_bright"
             android:onClick="onSendTweet"
-            android:text="@string/send" />
+            android:text="@string/send"
+            android:enabled="false"/>
 
         <TextView
             android:id="@+id/tvCounter"
