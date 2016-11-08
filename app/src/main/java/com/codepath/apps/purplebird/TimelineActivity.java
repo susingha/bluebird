@@ -40,6 +40,7 @@ public class TimelineActivity extends AppCompatActivity implements ActivityCommu
     FragmentTransaction ftCompose;
     String status;
     private TwitterNetworkClient client;
+    ViewPager vpPager;
 
     HomeTimelineFragment homeTimelineFragment;
 
@@ -50,7 +51,7 @@ public class TimelineActivity extends AppCompatActivity implements ActivityCommu
 
         client = TwitterApp.getRestClient();
 
-        ViewPager vpPager = (ViewPager) findViewById(R.id.viewpager);
+        vpPager = (ViewPager) findViewById(R.id.viewpager);
         vpPager.setAdapter(new TweetsPagerAdapter(getSupportFragmentManager()));
         PagerSlidingTabStrip tabStrip = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         tabStrip.setViewPager(vpPager);
@@ -140,6 +141,7 @@ public class TimelineActivity extends AppCompatActivity implements ActivityCommu
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
                 Log.d(TAG, "update - onSuccess");
                 Tweet newTweet = Tweet.fromJSON(response);
+                vpPager.setCurrentItem(0);
                 if (homeTimelineFragment != null)
                     homeTimelineFragment.addTweetOnTop(newTweet);
                 else
