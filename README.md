@@ -45,6 +45,7 @@ The following **additional** features are implemented:
 * [x] Moved the network handling code into the TweetsListFragment base class
 * [x] Usernames can be clicked to open the corresponding profile
 * [x] Hashtags can be clicked to open corresponding search
+* [x] On Composing a new tweet, reveal the home timeline fragment, scroll to the top and insert the tweet into the home timeline locally.
 
 
 ## Video Walkthrough
